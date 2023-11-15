@@ -1,4 +1,4 @@
-package com.cecloud.rocketmq.consumer;
+package com.cecloud.rocketmq.common.consumer;
 
 public class ConsumerDemo {
 

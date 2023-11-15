@@ -1,4 +1,4 @@
-package com.cecloud.rocketmq.consumer;
+package com.cecloud.rocketmq.common.consumer;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;

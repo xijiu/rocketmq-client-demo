@@ -1,4 +1,4 @@
-package com.cecloud.rocketmq.producer;
+package com.cecloud.rocketmq.common.producer;
 
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.TransactionListener;

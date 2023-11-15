@@ -1,4 +1,4 @@
-package com.cecloud.rocketmq.producer;
+package com.cecloud.rocketmq.common.producer;
 
 import com.alibaba.fastjson.JSON;
 import com.cecloud.rocketmq.PubTools;

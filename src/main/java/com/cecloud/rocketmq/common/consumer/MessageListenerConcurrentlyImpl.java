@@ -1,4 +1,4 @@
-package com.cecloud.rocketmq.consumer;
+package com.cecloud.rocketmq.common.consumer;
 
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
