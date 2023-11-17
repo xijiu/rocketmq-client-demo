@@ -13,6 +13,6 @@ public class TransactionConsumer implements RocketMQListener<String> {
 
     @Override
     public void onMessage(String msg) {
-        log.info("接受到事务消息: {}", msg);
+        log.info("消费组接收到事务消息: {}", msg);
     }
 }

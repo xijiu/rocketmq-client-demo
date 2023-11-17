@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class TransactionTest {
@@ -18,11 +19,12 @@ public class TransactionTest {
     @Autowired
     private TransactionLogManager logManager;
 
-
     @Test
     public void transactionMessage() throws InterruptedException {
         producer.sendTransactionalMessage();
-        System.out.println(logManager.list());
+        logManager.list();
+        Thread.sleep(60000);
+        logManager.list();
     }
 
 }

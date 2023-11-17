@@ -1,8 +1,6 @@
 package com.cecloud.rocketmq.springboot.producer;
 
-import com.alibaba.fastjson.JSON;
 import com.cecloud.rocketmq.springboot.TransactionLog;
-import com.cecloud.rocketmq.springboot.MessageTags;
 import com.cecloud.rocketmq.springboot.TransactionLogManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
@@ -12,7 +10,6 @@ import org.springframework.messaging.Message;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 
-import java.util.Objects;
 
 /**
  * rocketmq事务的监听类
@@ -39,21 +36,19 @@ public class MyTransactionListener implements RocketMQLocalTransactionListener {
      */
     @Override
     public RocketMQLocalTransactionState executeLocalTransaction(Message message, Object arg) {
-        log.info("执行本地事务：");
         String transactionId = (String) message.getHeaders().get("transactionId");
-        MessageTags tag = message.getHeaders().get("tag", MessageTags.class);
-        if (tag.getValue().equals("commit")) {
+        String tag = (String) message.getHeaders().get("tag");
+        log.info("执行本地事务, 事务Id：{}, tag: {}", transactionId, tag);
+        if (tag.equals("tag1")) {
             String body = message.getPayload().toString();
             localTransactionCreateOrder(transactionId, body);
             log.info("已提交本地事务: {}",transactionId);
             return RocketMQLocalTransactionState.COMMIT;
-        }
-        else if (tag.getValue().equals("rollback")) {
+        } else if (tag.equals("tag2")) {
             log.error("本地事务执行失败");
             transactionRollBack(message);
             return RocketMQLocalTransactionState.ROLLBACK;
-        }
-        else {
+        } else {
             return RocketMQLocalTransactionState.UNKNOWN;
         }
     }
@@ -67,13 +62,13 @@ public class MyTransactionListener implements RocketMQLocalTransactionListener {
      */
     @Override
     public RocketMQLocalTransactionState checkLocalTransaction(Message msg) {
-        log.info("回查本地事务状态, 事务id: {}", msg.getHeaders().get("transactionId"));
+        String tag = (String) msg.getHeaders().get("tag");
+        log.info("回查本地事务状态, 事务id: {}, tag: {}", msg.getHeaders().get("transactionId"), tag);
         RocketMQLocalTransactionState state;
-        MessageTags tag = msg.getHeaders().get("tag", MessageTags.class);
-        if (tag.getValue().equals("check_back_and_commit")) {
+        if (tag.equals("tag3")) {
             state = RocketMQLocalTransactionState.COMMIT;
         }
-        else if (tag.getValue().equals("check_back_and_rollback")) {
+        else if (tag.equals("tag4")) {
             state = RocketMQLocalTransactionState.ROLLBACK;
         }
         else {
@@ -88,7 +83,7 @@ public class MyTransactionListener implements RocketMQLocalTransactionListener {
         transactionLog.setId(transactionId);
         transactionLog.setDetail(body);
         transactionLogManager.insert(transactionLog);
-        log.info("创建订单成功，订单: {}", JSON.toJSONString(transactionLog));
+        log.info("创建订单成功，订单id: {}, 订单内容: {}",  transactionLog.getId(), transactionLog.getDetail());
     }
 
     /**
@@ -98,7 +93,8 @@ public class MyTransactionListener implements RocketMQLocalTransactionListener {
      */
     private void transactionRollBack(Message message) {
         // 撤销订单
-        transactionLogManager.remove(Objects.requireNonNull(message.getHeaders().get("transactionId")).toString());
-        log.info("本地事务回滚，删除对应订单: {}", JSON.toJSONString(message.getPayload()));
+        String transactionId = (String) message.getHeaders().get("transactionId");
+        transactionLogManager.remove(transactionId);
+        log.info("本地事务回滚，删除对应订单, 订单id: {}, 订单内容: {}",  transactionId, message.getPayload());
     }
 }
